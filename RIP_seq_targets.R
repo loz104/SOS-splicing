@@ -5,6 +5,7 @@ library(readr)
 library(tibble)
 library(ggplot2)
 library(ggrepel)
+library(limma)
 
 #-----------------------------------------------
 # Function: calculate enrichment between IP and Input
@@ -56,6 +57,24 @@ ranked_final <- enr_all %>%
     final_score     = ratio_F_nt * reproducibility
   )
 
+# Statistical significance (P-values) was assessed using the limma
+
+expr <- df %>%
+  select(gene, nt1_enrich, nt2_enrich, F1_enrich, F2_enrich) %>%
+  column_to_rownames("gene") %>%
+  as.matrix() %>%
+  `+`(1) %>%
+  log2()
+
+group <- factor(c("noTag", "noTag", "tag", "tag"))
+design <- model.matrix(~ group)
+
+fit <- lmFit(expr, design)
+fit <- eBayes(fit)
+
+res <- topTable(fit, coef = 2, number = Inf) %>%
+  rownames_to_column("gene")
+
 #-----------------------------------------------
 # Visualization of enriched genes (log2FC vs reproducibility)
 # Assume 'df' contains log2FC and reproducibility info
@@ -74,3 +93,5 @@ p <- p +
   geom_label_repel(data = sig_genes, aes(label = gene), max.overlaps = 10000)
 
 print(p)
+
+
