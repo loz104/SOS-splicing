@@ -28,6 +28,9 @@ For questions or issues, please open a GitHub issue or contact:
 - **`PSI_analyses.R`**  
   Generates box plots of alternative splicing events analyzed using rMATS.
 
+- **`A_to_I_freq.R`**  
+  Calculate A-to-I RNA editing frequencies using pileup analysis.
+  
 ---
 
 ## System Requirements
